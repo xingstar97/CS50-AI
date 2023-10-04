@@ -39,6 +39,7 @@ def load_data(directory):
             ])
             # The extend() method adds any iterable to the end of the current list.
             # word_tokenize() divide strings into lists of substrings
+            # The isalpha() method returns True if all the characters are alphabet letters
     return contents
 
 

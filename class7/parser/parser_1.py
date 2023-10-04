@@ -15,10 +15,11 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> NP VP Conj NP VP | NP VP
-NP -> N | Det N | Det Adj N | Adj N | N PP
-VP -> V | Adv V | V PP |V NP | V Adv | V PP | V NP PP
-PP -> P NP
+S -> S Conj S | NP VP | S Conj VP
+NP -> N | Det N | Det AP N | AP N | NP PP
+VP -> V | Adv VP | V PP | V NP | VP Adv
+PP -> P NP 
+AP -> Adj | Adj AP
 
 """
 
@@ -66,9 +67,15 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
-    words = list()
+    words = []
+    # parsed = nltk.word_tokenize(sentence)
+    # for word in parsed:
+    #     for c in word:
+    #         if c.isalpha():
+    #             words.add(word.lower())
+    # return list(words)
     words.extend([
-        word.lower() for word in nltk.word_tokenize(sentence) if any(c.isalpha()) for c in word]) 
+        word.lower() for word in nltk.word_tokenize(sentence) if any(c.isalpha() for c in word)]) 
     return words
 
 
@@ -80,13 +87,14 @@ def np_chunk(tree):
     noun phrases as subtrees.
     """
     chunk = list()
-    for sub in tree.subtrees():
-        for sub_sub in sub:
-            if sub_sub.label() == "NP":
-                break
-        if sub.lable() == "NP":
-            chunk.add(sub)
+    for sub in tree.subtrees(lambda s: s.height()!=tree.height()):
+        if any(sub_sub.label() == "NP" for sub_sub in sub.subtrees(lambda s:s.height()!= sub.height())):
+                continue
+        elif sub.label() == "NP":
+            chunk.append(sub)
     return chunk
+
+# subtrees include the tree itself
 
 
 
